@@ -1,10 +1,14 @@
-var Class = function(args) {
-  this.constructor = args.initialize || function() {};
+var Class = function(child, Parent) {
+  // this.constructor = child.initialize || function() {};
+  // this.constructor = function(){};
 
-  for(var i in args) {
-    if (typeof args[i] == 'function' && i != 'initialize') {
-      this.constructor.prototype[i] = args[i];
-    }
+  if (Parent)
+     // this.constructor.prototype.constructor.prototype = parent.prototype;
+     this.constructor.prototype = new Parent();
+
+  for (var key in child) {
+    if (key != 'initialize' && typeof child[key] == 'function')
+      this.constructor.prototype[key] = child[key];
   }
 
   return this.constructor;
