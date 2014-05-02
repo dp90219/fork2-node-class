@@ -3,7 +3,7 @@ var Class = function(args) {
 
   for(var i in args) {
     if (args[i].hasOwnProperty && typeof args[i] == 'function' && i != 'initialize') {
-      constructor.prototype[i] = args[i];
+      this.constructor.prototype[i] = args[i];
     }
   }
 
