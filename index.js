@@ -20,8 +20,12 @@ module.exports = function(child, ParentFunc) {
     if (key != "initialize" && child.hasOwnProperty(key))
       ChildFunc.prototype[key] = child[key];
 
+  var current_class = ChildFunc;
   ChildFunc.prototype.super = function(name) {
-    var result = (new ParentFunc())[name].apply(this, [].slice.call(arguments, 1));
+    var temp = current_class;
+    current_class = current_class.__super__;
+    var result = current_class.prototype[name].apply(this, [].slice.call(arguments, 1));
+    current_class = temp;
     return result;
   };
 
