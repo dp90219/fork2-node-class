@@ -1,23 +1,27 @@
 module.exports = function(child, ParentFunc) {
   var ChildFunc = child.initialize || function() {};
 
+  // ChildFunc.prototype.constructor = ChildFunc;
+
   ParentFunc = ParentFunc || Object;
-  
-  // if ParentFunc `hasOwnProperty` is true, it would miss it when to use `ParentFunc.prototype`, 
-  // so I use `new' to produce a `clsss`
-  var parent = new ParentFunc();
-  for (var key in parent) {
-    //ChildFunc.prototype[key] = ParentFunc.prototype[key];
-    ChildFunc.prototype[key] = parent[key];
-  }
+
+  // ChildFunc.prototype = new ParentFunc();
+
+  function ctor() {
+    this.constructor = ChildFunc;
+  };
+
+  ctor.prototype = ParentFunc.prototype;
+  ChildFunc.prototype = new ctor();
+
 
   ChildFunc.__super__ = ParentFunc;
 
   //override or not
-  var _super = parent;
+  var _super = ParentFunc.prototype;
   for (var name in child) {
     if (name != "initialize") {
-      ChildFunc.prototype[name] = typeof child[name] == "function" && typeof parent[name] == "function" ?
+      ChildFunc.prototype[name] = typeof child[name] == "function" && typeof _super[name] == "function" ?
         (function(name, fn) {
           return function() {
             var tmp = this._super;
@@ -34,14 +38,10 @@ module.exports = function(child, ParentFunc) {
 
   var current_class = ChildFunc;
   ChildFunc.prototype.super = function(name) {
-    var temp = current_class;
+    var tmp = current_class;
     current_class = current_class.__super__;
-    // the reason why use `new` is the same as the 6th line.
-    // var result = current_class.prototype.apply(this, [].slice.call(arguments, 1));
-    var curClass = new current_class();
-    var result = curClass[name].apply(this, [].slice.call(arguments, 1));
-
-    current_class = temp;
+    var result = current_class.prototype[name].apply(this, [].slice.call(arguments, 1));
+    current_class = tmp;
     return result;
   };
 
