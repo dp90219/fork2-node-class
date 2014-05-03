@@ -36,7 +36,7 @@ module.exports = function(child, ParentFunc) {
   ChildFunc.prototype.super = function(name) {
     var temp = current_class;
     current_class = current_class.__super__;
-    // the reason why user `new` is the same as the 6th line.
+    // the reason why use `new` is the same as the 6th line.
     // var result = current_class.prototype.apply(this, [].slice.call(arguments, 1));
     var curClass = new current_class();
     var result = curClass[name].apply(this, [].slice.call(arguments, 1));
