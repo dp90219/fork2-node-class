@@ -2,9 +2,12 @@ module.exports = function(child, ParentFunc) {
   var ChildFunc = child.initialize || function() {};
 
   ParentFunc = ParentFunc || Object;
-
+  
+  // if ParentFunc `hasOwnProperty` is true, it would miss it when to use `ParentFunc.prototype`, 
+  // so I use `new' to produce a `clsss`
   var parent = new ParentFunc();
   for (var key in parent) {
+    //ChildFunc.prototype[key] = ParentFunc.prototype[key];
     ChildFunc.prototype[key] = parent[key];
   }
 
@@ -33,7 +36,11 @@ module.exports = function(child, ParentFunc) {
   ChildFunc.prototype.super = function(name) {
     var temp = current_class;
     current_class = current_class.__super__;
-    var result = current_class.prototype[name].apply(this, [].slice.call(arguments, 1));
+    // the reason why user `new` is the same as the 6th line.
+    // var result = current_class.prototype.apply(this, [].slice.call(arguments, 1));
+    var curClass = new current_class();
+    var result = curClass[name].apply(this, [].slice.call(arguments, 1));
+
     current_class = temp;
     return result;
   };
