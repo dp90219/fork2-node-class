@@ -16,9 +16,24 @@ module.exports = function(child, ParentFunc) {
 
   ChildFunc.__super__ = ParentFunc;
 
-  for (var key in child)
-    if (key != "initialize" && child.hasOwnProperty(key))
-      ChildFunc.prototype[key] = child[key];
+  var _super = parent;
+  for (var name in child) {
+    if (name != "initialize") {
+      // ChildFunc.prototype[key] = child[key];
+      ChildFunc.prototype[name] = typeof child[name] == "function" && typeof parent[name] == "function" ?
+        (function(name, fn) {
+          return function() {
+            var tmp = this._super;
+            this._super = _super[name];
+            var ret = fn.apply(this, arguments);
+            this._super = tmp;
+
+            return ret;
+          };
+        })(name, child[name]) :
+        child[name];
+    }
+  }
 
   var current_class = ChildFunc;
   ChildFunc.prototype.super = function(name) {
