@@ -3,12 +3,6 @@ module.exports = function(child, ParentFunc) {
 
   ParentFunc = ParentFunc || Object;
 
-  // ChildFunc.prototype.constructor.prototype = ParentFunc.prototype;
-
-  // for (var key in ParentFunc.prototype) {
-  //   ChildFunc.prototype[key] = ParentFunc.prototype[key];
-  // }
-
   var parent = new ParentFunc();
   for (var key in parent) {
     ChildFunc.prototype[key] = parent[key];
@@ -16,10 +10,10 @@ module.exports = function(child, ParentFunc) {
 
   ChildFunc.__super__ = ParentFunc;
 
+  //override or not
   var _super = parent;
   for (var name in child) {
     if (name != "initialize") {
-      // ChildFunc.prototype[key] = child[key];
       ChildFunc.prototype[name] = typeof child[name] == "function" && typeof parent[name] == "function" ?
         (function(name, fn) {
           return function() {
