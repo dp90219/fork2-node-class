@@ -1,9 +1,20 @@
-module.exports = function(child) {
-  var classFunc = child.initialize || function() {};
+module.exports = function(child, ParentFunc) {
+  var ChildFunc = child.initialize || function() {};
 
-  for (var key in child) 
-    if (key != "initialize")
-      classFunc.prototype[key] = child[key];
+  ParentFunc = ParentFunc || Object;
 
-  return classFunc;
+  // ChildFunc.prototype.constructor.prototype = ParentFunc.prototype;
+
+  for (var key in ParentFunc.prototype) {
+    ChildFunc.prototype[key] = ParentFunc.prototype[key];
+  }
+
+  ChildFunc.__super__ = ParentFunc;
+
+  for (var key in child)
+    if (key != "initialize" && child.hasOwnProperty(key))
+      ChildFunc.prototype[key] = child[key];
+
+
+  return ChildFunc;
 }
